@@ -24,6 +24,23 @@ OPENWEATHERMAP_API_KEY=your_api_key_here
 ```
 ## Usage
 
+Default Setup and Run
+
+You can use the provided Bash script to install dependencies, fetch weather data for a default location, and run tests. Before running test you need to define them in your `package.json` file.
+Run the following command:
+```
+./setup.sh
+
+```
+
+If you encounter permissions issues, you may need to set the script as executable:
+
+```
+chmod +x setup.sh
+
+```
+
+
 To fetch the weather for a specific city and country, run the following command:
 ```
 node weather.js "City" "Country"
@@ -31,6 +48,12 @@ node weather.js "City" "Country"
 Example
 ```
 node weather.js "Asuncion" "PY"
+```
+
+If you want to run tests defined in your `package.json` use:
+
+```
+npm test
 ```
 
 ## Considerations
