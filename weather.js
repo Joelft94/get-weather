@@ -1,47 +1,23 @@
-import axios from 'axios';
-import 'dotenv/config'
+import 'dotenv/config';
+import { geocode } from './src/geocode.js';
+import { fetchWeather } from './src/fetchWeather.js';
+import { showHelp } from './src/showHelp.js';
 
-const apiKey = process.env.API_KEY
+const apiKey = process.env.API_KEY;
+// console.log(apiKey);
+const [arg1, arg2] = process.argv.slice(2);
 
-// Main function to get weather information
-const getWeather = async (city, country) => {
-  try {
-    // Geo API call to get latitude and longitude of our city
-    const geoResponse = await axios.get('http://api.openweathermap.org/geo/1.0/direct', {
-      params: {
-        q: `${city},${country}`,
-        limit: 1,
-        appid: apiKey,
-      },
-    });
-
-    const { lat, lon } = geoResponse.data[0];
-
-    // Weather API call to get weather information
-    const weatherResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
-      params: {
-        lat,
-        lon,
-        appid: apiKey,
-        units: 'metric', // Metric units for Celsius
-      },
-    });
-
-    const weather = weatherResponse.data;
-    console.log(`Weather in ${weather.name}, ${country}:`);
-    console.log(`Temperature: ${weather.main.temp}°C`);
-    console.log(`Weather: ${weather.weather[0].description}`);
-  } catch (error) {
-    console.error('Error fetching weather data:', error.message);
-  }
-};
-
-// Get city and country from command line arguments
-const [city, country] = process.argv.slice(2);
-
-if (!city || !country) {
-  console.error('Please provide both a city and a country.');
-  process.exit(1);
+if (arg1 === '--help') {
+  showHelp();
+} else if (arg1 && arg2) {
+  geocode(arg1, arg2, apiKey)
+    .then(({ lat, lon }) => fetchWeather(lat, lon, apiKey))
+    .then(weather => {
+      console.log(`Weather in ${weather.name}, ${arg2}:`);
+      console.log(`Temperature: ${weather.main.temp}°C`);
+      console.log(`Weather: ${weather.weather[0].description}`);
+    })
+    .catch(error => console.error(error.message));
+} else {
+  console.error('Invalid input. Use --help to see usage instructions.');
 }
-
-getWeather(city, country);
